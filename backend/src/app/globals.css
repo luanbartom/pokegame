@@ -1,0 +1,82 @@
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #b2d8ff, #ffffff);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  justify-content: center;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #1e3a8a;
+}
+
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cards {
+  display: flex;
+  gap: 30px;
+  margin: 20px 0;
+}
+
+.pokemon-card {
+  background: #fff;
+  border: 2px solid #ccc;
+  border-radius: 15px;
+  width: 150px;
+  text-align: center;
+  padding: 10px;
+  transition: transform 0.2s ease;
+}
+
+.pokemon-card:hover {
+  transform: scale(1.05);
+}
+
+.pokemon-card .sprite {
+  width: 100px;
+  height: 100px;
+}
+
+.btn {
+  background-color: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn:hover {
+  background-color: #1d4ed8;
+}
+
+.btn.battle {
+  background-color: #dc2626;
+  margin-top: 10px;
+}
+
+.btn.battle:hover {
+  background-color: #b91c1c;
+}
+
+.log {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 10px;
+  min-width: 200px;
+  text-align: center;
+}
