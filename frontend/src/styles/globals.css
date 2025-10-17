@@ -55,7 +55,7 @@ body {
 
 .container {
   text-align: center;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(247, 244, 244, 0.9);
   padding: 60px 40px;
   border-radius: 20px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
@@ -66,8 +66,8 @@ body {
 .container h1 {
   font-size: 2rem;
   margin-bottom: 30px;
-  color: #2c2c2c;
-  text-shadow: 1px 1px 2px #ffcb05;
+  color: #e20606;
+  text-shadow: 1px 1px 2px #cf7e7e;
 }
 
 .btn {
@@ -97,6 +97,85 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ===== HOME - ESCOLHER TREINADOR ===== */
+.container {
+  text-align: center;
+  background: #cc0404(238, 229, 229, 0.9);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 22px 24px rgba(0, 0, 0, 0.3);
+  max-width: 700px;
+  margin: 50px auto;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.trainer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin: 30px 0;
+}
+
+.trainer-card {
+  background: #faf8f8;
+  border-radius: 15px;
+  padding: 10px;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.trainer-card:hover {
+  transform: scale(1.05);
+}
+
+.trainer-card.selected {
+  border-color: #fa0707;
+  box-shadow: 0 0 15px #f71f02;
+}
+
+.trainer-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.trainer-name input {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #3bc5ca;
+  width: 70%;
+  margin-bottom: 20px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.trainer-name input:focus {
+  border-color: #ffcb05;
+}
+
+.btn {
+  background: #010736;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  background: #2a35a0;
+}
+
+.btn:disabled {
+  background: rgb(114, 113, 113);
+  cursor: not-allowed;
+  transform: none;
 }
 
 
@@ -170,4 +249,234 @@ p {
 }
 .btn:hover {
   background: #005bb5;
+}
+
+/* === SELECT TEAM PAGE === */
+.select-team-container {
+  text-align: center;
+  margin: 2rem auto;
+  color: #333;
+}
+
+.select-team-container h1 {
+  font-size: 2rem;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+}
+
+.pokemon-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.btn-start {
+  margin-top: 2rem;
+  background-color: #ffcb05;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.btn-start:hover {
+  background-color: #facc15;
+  transform: scale(1.05);
+}
+
+/* --- Card Pokémon --- */
+.pokemon-card {
+  width: 220px;
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+  text-align: center;
+}
+
+.pokemon-card:hover {
+  transform: scale(1.05);
+  border-color: #facc15;
+}
+
+.pokemon-card h3 {
+  text-transform: capitalize;
+  margin-bottom: 0.3rem;
+}
+
+.stats {
+  margin-top: 0.5rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 6px;
+  font-size: 0.9rem;
+  text-align: left;
+}
+
+.stat {
+  margin: 2px 0;
+}
+
+.moves {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  text-align: left;
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.moves ul {
+  margin: 4px 0 0 15px;
+  padding: 0;
+  list-style: disc;
+}
+
+.moves li {
+  text-transform: capitalize;
+}
+
+/* =======================
+   SELECIONAR POKÉMON
+======================= */
+
+.pokemon-select-container {
+  text-align: center;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: linear-gradient(180deg, #f7faff 0%, #e9f0ff 100%);
+  min-height: 100vh;
+}
+
+.pokemon-select-container h1 {
+  color: #1e3a8a;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.pokemon-select-container p {
+  color: #444;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.pokemon-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  padding-bottom: 40px;
+}
+
+.pokemon-card {
+  border: 2px solid #ddd;
+  border-radius: 16px;
+  padding: 15px;
+  width: 180px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8f8f8 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: center;
+  overflow: hidden;
+}
+
+.pokemon-card:hover {
+  transform: scale(1.1);
+  border-color: #facc15;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, #fffbe6 0%, #fef3c7 100%);
+}
+
+.pokemon-card img {
+  width: 100px;
+  height: 100px;
+  transition: transform 0.25s ease;
+}
+
+.pokemon-card:hover img {
+  transform: scale(1.25);
+}
+
+.pokemon-card.selected {
+  border-color: #facc15;
+  background: #fff8d9;
+  box-shadow: 0 6px 18px rgba(255, 200, 0, 0.4);
+}
+
+.pokemon-card h3 {
+  margin: 8px 0 4px;
+  font-size: 1.1rem;
+  text-transform: capitalize;
+}
+
+.types {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.type {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  color: white;
+  font-weight: 600;
+}
+
+/* 🌈 Cores dos tipos Pokémon */
+.type.fire { background: #f08030; }
+.type.water { background: #6890f0; }
+.type.grass { background: #78c850; }
+.type.electric { background: #f8d030; color: #000; }
+.type.bug { background: #a8b820; }
+.type.normal { background: #a8a878; }
+.type.poison { background: #a040a0; }
+.type.flying { background: #a890f0; }
+.type.ground { background: #e0c068; color: #000; }
+.type.psychic { background: #f85888; }
+.type.rock { background: #b8a038; }
+.type.ghost { background: #705898; }
+.type.ice { background: #98d8d8; color: #000; }
+.type.dragon { background: #7038f8; }
+.type.fighting { background: #c03028; }
+.type.steel { background: #b8b8d0; color: #000; }
+.type.fairy { background: #f0b6bc; color: #000; }
+
+.moves {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+  color: #444;
+}
+
+.confirm {
+  margin-top: 25px;
+  padding: 12px 24px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: 0.2s;
+}
+
+.confirm:hover {
+  background: #1e40af;
+  transform: scale(1.05);
 }

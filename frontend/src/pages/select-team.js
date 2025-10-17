@@ -1,111 +1,68 @@
-import { useState, useEffect } from "react";
-import PokemonCard from "@/components/PokemonCard.js";
-import api from "@/Services/api";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 export default function SelectTeam() {
-  const [pokemons, setPokemons] = useState([]);
-  const [selected, setSelected] = useState([]);
-  const [hovered, setHovered] = useState(null);
+  const [team, setTeam] = useState([]);
   const router = useRouter();
 
-  // 🔹 Simulação temporária até o backend estar pronto
+  // Carrega time salvo do localStorage
   useEffect(() => {
-    const mockData = [
-      {
-        id: 1,
-        name: "Pikachu",
-        image:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-        animated:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif",
-      },
-      {
-        id: 2,
-        name: "Charmander",
-        image:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
-        animated:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/4.gif",
-      },
-      {
-        id: 3,
-        name: "Bulbasaur",
-        image:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-        animated:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif",
-      },
-      {
-        id: 4,
-        name: "Squirtle",
-        image:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
-        animated:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/7.gif",
-      },
-      {
-        id: 5,
-        name: "Eevee",
-        image:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
-        animated:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/133.gif",
-      },
-      {
-        id: 6,
-        name: "Gengar",
-        image:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png",
-        animated:
-          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/94.gif",
-      },
-    ];
-    setPokemons(mockData);
+    const saved = localStorage.getItem("selectedTeam");
+    if (saved) setTeam(JSON.parse(saved));
   }, []);
 
-  // 🔹 Alternar seleção de Pokémon
-  function toggleSelect(pokemon) {
-    if (selected.find((p) => p.id === pokemon.id)) {
-      setSelected(selected.filter((p) => p.id !== pokemon.id));
-    } else if (selected.length < 3) {
-      setSelected([...selected, pokemon]);
-    }
-  }
-
-  // 🔹 Ir para tela de batalha
-  function handleConfirm() {
-    if (selected.length === 0) {
-      alert("Escolha pelo menos um Pokémon!");
-      return;
-    }
-    localStorage.setItem("selectedTeam", JSON.stringify(selected));
+  const handleStartBattle = () => {
+    if (team.length === 0) return alert("Selecione pelo menos 1 Pokémon!");
     router.push("/battle");
-  }
+  };
 
   return (
-    <div className="container">
-      <h1>Selecione sua Equipe Pokémon</h1>
-      <p>Escolha até 3 Pokémon para a batalha!</p>
+    <div className="select-team-container">
+      <h1>⚔️ Sua Equipe Pokémon</h1>
 
-      <div className="grid">
-        {pokemons.map((pokemon) => (
-          <PokemonCard
-            key={pokemon.id}
-            pokemon={pokemon}
-            selected={selected.some((p) => p.id === pokemon.id)}
-            onSelect={() => toggleSelect(pokemon)}
-            hovered={hovered}
-            setHovered={setHovered}
-          />
-        ))}
-      </div>
+      {team.length === 0 ? (
+        <p>Nenhum Pokémon selecionado ainda.</p>
+      ) : (
+        <div className="pokemon-grid">
+          {team.map((p) => (
+            <PokemonCard key={p.id} pokemon={p} />
+          ))}
+        </div>
+      )}
 
-      <div style={{ marginTop: 30 }}>
-        <button className="btn" onClick={handleConfirm}>
-          Confirmar Equipe ({selected.length}/3)
+      {team.length > 0 && (
+        <button className="btn-start" onClick={handleStartBattle}>
+          🚀 Iniciar Batalha
         </button>
+      )}
+    </div>
+  );
+}
+
+// --- Componente de card do Pokémon ---
+function PokemonCard({ pokemon }) {
+  return (
+    <div className="pokemon-card">
+      <h3>{pokemon.name.toUpperCase()}</h3>
+      <img src={pokemon.animated} alt={pokemon.name} width={100} height={100} />
+
+      <div className="stats">
+        <div className="stat"><strong>HP:</strong> {pokemon.hp}</div>
+        <div className="stat"><strong>Ataque:</strong> {pokemon.attack}</div>
+        <div className="stat"><strong>Defesa:</strong> {pokemon.defense}</div>
+        <div className="stat"><strong>Velocidade:</strong> {pokemon.speed}</div>
       </div>
+
+      {pokemon.moves && pokemon.moves.length > 0 && (
+        <div className="moves">
+          <strong>Golpes:</strong>
+          <ul>
+            {pokemon.moves.map((m, i) => (
+              <li key={i}>{m}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
