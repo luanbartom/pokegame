@@ -5,7 +5,7 @@ export default function SelectTeam() {
   const [team, setTeam] = useState([]);
   const router = useRouter();
 
-  // Carrega time salvo do localStorage
+  // Carrega o time salvo no localStorage
   useEffect(() => {
     const saved = localStorage.getItem("selectedTeam");
     if (saved) setTeam(JSON.parse(saved));
@@ -45,6 +45,17 @@ function PokemonCard({ pokemon }) {
     <div className="pokemon-card">
       <h3>{pokemon.name.toUpperCase()}</h3>
       <img src={pokemon.animated} alt={pokemon.name} width={100} height={100} />
+
+      {/* Tipos do Pokémon */}
+      {pokemon.types && (
+        <div className="types">
+          {pokemon.types.map((type, index) => (
+            <span key={index} className={`type ${type}`}>
+              {type.toUpperCase()}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="stats">
         <div className="stat"><strong>HP:</strong> {pokemon.hp}</div>
