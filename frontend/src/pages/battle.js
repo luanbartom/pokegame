@@ -1,107 +1,115 @@
 import { useState, useEffect } from "react";
 import HPBar from "@/components/HPBar";
 import ConditionBar from "@/components/ConditionBar";
-import api from "@/services/api";
+import { getPokemon } from "@/services/api";
 
 export default function Battle() {
   const [battle, setBattle] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [log, setLog] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [team, setTeam] = useState([]);
 
-  // Inicia a batalha automaticamente
   useEffect(() => {
-    startBattle();
+    const savedTeam = localStorage.getItem("selectedTeam");
+    if (savedTeam) {
+      const parsed = JSON.parse(savedTeam);
+      setTeam(parsed);
+      if (parsed.length > 0) startBattle(parsed[0]);
+    } else {
+      setError("Nenhum time encontrado! Volte e selecione seus Pokémon.");
+    }
   }, []);
 
-  // === Função para iniciar a batalha ===
-  async function startBattle() {
+  async function startBattle(selectedPokemon = null) {
     setLoading(true);
     setError(null);
 
-    // Pokémons fixos por enquanto
-    const player = {
+    const player = selectedPokemon || {
       id: 25,
-      name: "pikachu",
-      type: "electric",
+      name: "Pikachu",
       hp: 100,
       condition: "normal",
-      image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
-      animated: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif",
-    };
-
-    const enemy = {
-      id: 1,
-      name: "bulbasaur",
-      type: "grass",
-      hp: 100,
-      condition: "normal",
-      image: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-      animated: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif",
+      moves: ["tackle", "thunder-shock", "quick-attack", "tail-whip"],
+      animated:
+        "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif",
     };
 
     try {
-      // 🔹 tenta chamar o backend
-      const response = await api.post("/battle/start", { player, enemy });
-      setBattle(response.data.battle);
-      setLog(response.data.battle.log || []);
-    } catch (err) {
-      console.warn("Servidor não respondeu. Usando simulação local.");
-      // 🔸 simula a batalha localmente se o backend não estiver ativo
+      const enemyId = Math.floor(Math.random() * 151) + 1;
+      const enemyData = await getPokemon(enemyId);
+      const enemy = { ...enemyData, hp: enemyData.hp, condition: "normal" };
       setBattle({ player, enemy, currentTurn: "player", winner: null });
-      setLog(["Batalha simulada iniciada (modo offline)."]);
+      setLog(["⚔️ Batalha iniciada!"]);
+    } catch (err) {
+      const enemy = {
+        id: 1,
+        name: "Bulbasaur",
+        hp: 100,
+        moves: ["tackle", "vine-whip", "growl", "leech-seed"],
+        animated:
+          "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif",
+        condition: "normal",
+      };
+      setBattle({ player, enemy, currentTurn: "player", winner: null });
+      setLog(["⚔️ Batalha simulada iniciada!"]);
     } finally {
       setLoading(false);
     }
   }
 
-  // === Função para realizar o ataque ===
-  async function handleAttack() {
-    if (!battle || battle.winner) return;
-    setLoading(true);
+  function handleMove(move) {
+    if (!battle || battle.winner || battle.currentTurn !== "player") return;
 
-    try {
-      // 🔹 tenta processar o turno via backend
-      const response = await api.post("/battle/turn");
-      setBattle(response.data.battle);
-      setLog(response.data.battle.log || []);
-    } catch (err) {
-      // 🔸 simulação local se o backend não responder
-      const playerAttack = Math.floor(Math.random() * 20) + 5;
-      const enemyAttack = Math.floor(Math.random() * 15) + 5;
-      let newBattle = { ...battle };
-      let newLog = [...log];
+    const playerAttack = Math.floor(Math.random() * 20) + 5;
+    const enemyAttack = Math.floor(Math.random() * 15) + 5;
+    const newBattle = { ...battle };
+    const newLog = [...log];
 
-      if (newBattle.currentTurn === "player") {
-        newBattle.enemy.hp = Math.max(newBattle.enemy.hp - playerAttack, 0);
-        newLog.unshift(`⚡ Pikachu causou ${playerAttack} de dano!`);
+    newBattle.enemy.hp = Math.max(newBattle.enemy.hp - playerAttack, 0);
+    newLog.unshift(
+      `⚡ ${newBattle.player.name} usou ${move}! Causou ${playerAttack} de dano!`
+    );
 
-        if (newBattle.enemy.hp <= 0) {
-          newBattle.winner = "player";
-          newLog.unshift("🎉 Pikachu venceu a batalha!");
-        } else {
-          newBattle.currentTurn = "enemy";
-          setTimeout(() => {
-            newBattle.player.hp = Math.max(newBattle.player.hp - enemyAttack, 0);
-            newLog.unshift(`🌿 Bulbasaur causou ${enemyAttack} de dano!`);
+    if (newBattle.enemy.hp <= 0) {
+      newBattle.winner = "player";
+      newLog.unshift(`🎉 ${newBattle.player.name} venceu a batalha!`);
+      setBattle(newBattle);
+      setLog(newLog);
+      return;
+    }
 
-            if (newBattle.player.hp <= 0) {
-              newBattle.winner = "enemy";
-              newLog.unshift("💀 Bulbasaur venceu a batalha!");
-            }
+    newBattle.currentTurn = "enemy";
+    setBattle(newBattle);
+    setLog(newLog);
 
-            newBattle.currentTurn = "player";
-            setBattle({ ...newBattle });
-            setLog([...newLog]);
-          }, 1000);
-        }
+    setTimeout(() => {
+      const enemyMove =
+        newBattle.enemy.moves[
+          Math.floor(Math.random() * newBattle.enemy.moves.length)
+        ];
+      newBattle.player.hp = Math.max(newBattle.player.hp - enemyAttack, 0);
+      newLog.unshift(
+        `🌿 ${newBattle.enemy.name} usou ${enemyMove}! Causou ${enemyAttack} de dano!`
+      );
+
+      if (newBattle.player.hp <= 0) {
+        newBattle.winner = "enemy";
+        newLog.unshift(`💀 ${newBattle.enemy.name} venceu a batalha!`);
       }
 
+      newBattle.currentTurn = "player";
       setBattle({ ...newBattle });
       setLog([...newLog]);
-    } finally {
-      setLoading(false);
-    }
+    }, 1000);
+  }
+
+  function handleSwitch(index) {
+    if (index === currentIndex || !team[index]) return;
+    setCurrentIndex(index);
+    startBattle(team[index]);
+    setLog((prev) => [`🔄 Você trocou para ${team[index].name}`, ...prev]);
   }
 
   if (loading && !battle) return <p>Carregando batalha...</p>;
@@ -109,9 +117,7 @@ export default function Battle() {
     return (
       <div className="container">
         <p>{error}</p>
-        <button className="btn" onClick={startBattle}>
-          🔁 Tentar novamente
-        </button>
+        <button onClick={() => startBattle(team[currentIndex])}>🔁 Tentar novamente</button>
       </div>
     );
   if (!battle) return null;
@@ -119,78 +125,55 @@ export default function Battle() {
   const { player, enemy, winner, currentTurn } = battle;
 
   return (
-    <div className="container">
-      <h2>Batalha Pokémon!</h2>
-
-      {winner && (
-        <div className="winner">
-          <h3>{winner === "player" ? "🎉 Você venceu!" : "💀 Você perdeu!"}</h3>
-          <img
-            src={winner === "player" ? player.animated : enemy.animated}
-            alt="Vencedor"
-            className="sprite"
-          />
-        </div>
-      )}
-
-      <div className="battlefield">
-        {/* Inimigo */}
-        <div className="pokemon-field">
-          <h3>Oponente: {enemy.name}</h3>
-          <img
-            src={enemy.animated}
-            alt={enemy.name}
-            className="sprite"
-          />
-          <HPBar hp={enemy.hp} maxHp={100} color="red" />
-          <ConditionBar condition={enemy.condition} />
-          <p>HP: {enemy.hp}/100</p>
-        </div>
-
-        {/* Jogador */}
-        <div className="pokemon-field">
-          <h3>Você: {player.name}</h3>
-          <img
-            src={player.animated}
-            alt={player.name}
-            className="sprite"
-          />
-          <HPBar hp={player.hp} maxHp={100} color="green" />
-          <ConditionBar condition={player.condition} />
-          <p>HP: {player.hp}/100</p>
-        </div>
+    <div className="battle-container">
+      {/* Inimigo */}
+      <div className="enemy-section">
+        <HPBar hp={enemy.hp} maxHp={enemy.hp} color="red" />
+        <ConditionBar condition={enemy.condition} />
+        <img src={enemy.animated} alt={enemy.name} className="sprite" />
+        <p>{enemy.name}</p>
       </div>
 
-      {/* Controles */}
-      {!winner && (
-        <div className="controls">
-          <p>
-            <strong>Turno atual:</strong>{" "}
-            {currentTurn === "player" ? "Sua vez!" : "Vez do inimigo..."}
-          </p>
-
-          <button
-            className="btn"
-            onClick={handleAttack}
-            disabled={currentTurn !== "player" || loading}
-          >
-            ⚡ Atacar
-          </button>
-
-          <button className="btn" onClick={startBattle}>
-            🔁 Reiniciar
-          </button>
-        </div>
-      )}
-
-      {/* Log da batalha */}
-      <div className="log">
-        <h4>Registro da batalha:</h4>
+      {/* Log */}
+      <div className="battle-log">
+        <h4>Relatório de batalha:</h4>
         <ul>
-          {log.map((entry, index) => (
-            <li key={index}>{entry}</li>
+          {log.map((entry, idx) => (
+            <li key={idx}>{entry}</li>
           ))}
         </ul>
+      </div>
+
+      {/* Jogador */}
+      <div className="player-section">
+        <HPBar hp={player.hp} maxHp={player.hp} color="green" />
+        <ConditionBar condition={player.condition} />
+        <img src={player.animated} alt={player.name} className="sprite" />
+        <p>{player.name}</p>
+
+        {!winner && currentTurn === "player" && (
+          <div className="moves">
+            {player.moves.map((move, idx) => (
+              <button key={idx} onClick={() => handleMove(move)}>
+                {move}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="switch-team">
+          {team.map((p, idx) => (
+            <button key={idx} onClick={() => handleSwitch(idx)}>
+              {p.name}
+            </button>
+          ))}
+        </div>
+
+        {winner && (
+          <div className="winner">
+            <h3>{winner === "player" ? "🎉 Você venceu!" : "💀 Você perdeu!"}</h3>
+          </div>
+        )}
       </div>
     </div>
   );
